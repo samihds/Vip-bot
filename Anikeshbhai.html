@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SURESHOT</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px;
+    }
+    h1 {
+      color: white;
+      margin-bottom: 30px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid green;
+      border-radius: 10px;
+    }
+    input {
+      width: 80%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 2px solid green;
+      border-radius: 5px;
+      font-size: 16px;
+      text-align: center;
+      background-color: #111;
+      color: white;
+    }
+    button {
+      background-color: #1a73e8;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      margin: 10px 5px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background-color: #0d5bba;
+      transform: scale(1.05);
+    }
+    #result {
+      margin: 20px 0;
+      padding: 15px;
+      font-size: 24px;
+      font-weight: bold;
+      border-radius: 5px;
+      background-color: #222;
+      min-height: 30px;
+    }
+    #history {
+      margin-top: 30px;
+      text-align: left;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      background-color: #111;
+      border-radius: 5px;
+    }
+    .history-entry {
+      padding: 8px;
+      border-bottom: 1px solid #333;
+    }
+    .clear-btn {
+      background-color: #d32f2f;
+    }
+    .clear-btn:hover {
+      background-color: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 SURESHOT PREDICTOR</h1>
+    
+    <label for="periodInput">Enter LAST 3 Digit Period:</label>
+    <input type="number" id="periodInput" placeholder="Enter 3-digit period" min="0" max="999" />
+    
+    <div>
+      <button onclick="checkResults()">Check Results</button>
+      <button onclick="clearHistory()" class="clear-btn">Clear History</button>
+    </div>
+    
+    <div id="result">--</div>
+    
+    <h3>📝 Prediction History:</h3>
+    <div id="history">No history yet</div>
+  </div>
+
+  <script>
+    let historyData = [];
+
+    function checkResults() {
+      const input = document.getElementById("periodInput").value.trim();
+      
+      if (!input || input.length !== 3 || isNaN(input)) {
+        alert("Please enter a valid 3-digit period number");
+        return;
+      }
+      
+      const num = parseInt(input);
+      const lastTwoDigits = num % 100; // Get last 2 digits
+      
+      // Enhanced calculation
+      let result;
+      if (lastTwoDigits >= 50) {
+        result = "BIG";
+      } else {
+        result = "SMALL";
+      }
+      
+      // Save to history
+      const timestamp = new Date().toLocaleTimeString();
+      historyData.unshift({
+        period: input,
+        result: result,
+        time: timestamp
+      });
+      
+      // Update display
+      updateDisplay(result);
+      updateHistory();
+      
+      // Clear input
+      document.getElementById("periodInput").value = "";
+    }
+
+    function updateDisplay(result) {
+      const resultElement = document.getElementById("result");
+      resultElement.innerHTML = result === 'BIG' 
+        ? '<span style="color:#4CAF50">BIG</span>' 
+        : '<span style="color:#F44336">SMALL</span>';
+      resultElement.style.backgroundColor = result === 'BIG' ? '#1B5E20' : '#4A148C';
+    }
+
+    function updateHistory() {
+      const historyElement = document.getElementById("history");
+      
+      if (historyData.length === 0) {
+        historyElement.innerHTML = "No history yet";
+        return;
+      }
+      
+      historyElement.innerHTML = historyData.map(entry => 
+        `<div class="history-entry">
+          <span style="color:#4CAF50">${entry.period}</span> - 
+          <span style="color:${entry.result === 'BIG' ? '#4CAF50' : '#F44336'}">${entry.result}</span> - 
+          <span style="color:#9E9E9E">${entry.time}</span>
+        </div>`
+      ).join('');
+    }
+
+    function clearHistory() {
+      if (confirm("Are you sure you want to clear all history?")) {
+        historyData = [];
+        document.getElementById("result").innerHTML = "--";
+        document.getElementById("result").style.backgroundColor = "#222";
+        updateHistory();
+      }
+    }
+  </script>
+</body>
+</html>
